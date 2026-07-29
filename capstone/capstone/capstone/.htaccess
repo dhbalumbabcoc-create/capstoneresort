@@ -1,0 +1,12 @@
+# Hide Apache server signature from error pages
+ServerSignature Off
+
+# Disable directory listing
+Options -Indexes
+
+# Custom error pages (optional - prevents Apache default 404 page)
+ErrorDocument 404 /capstone/capstone/index.php
+ErrorDocument 403 /capstone/capstone/unauthorized.php
+
+# PHP settings
+php_flag display_errors Off

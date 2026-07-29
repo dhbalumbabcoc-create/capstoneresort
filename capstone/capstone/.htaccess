@@ -1,0 +1,12 @@
+# Hide Apache server signature from error pages
+ServerSignature Off
+
+# Disable directory listing
+Options -Indexes
+
+# PHP settings
+php_flag display_errors Off
+
+# Redirect landing.php to landing2.php internally
+RewriteEngine On
+RewriteRule ^landing\.php$ landing2.php [L,QSA]

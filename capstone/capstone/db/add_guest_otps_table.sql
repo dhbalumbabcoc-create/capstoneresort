@@ -1,0 +1,9 @@
+CREATE TABLE guest_otps (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100) NOT NULL,
+    guest_name VARCHAR(100) NOT NULL,
+    contact_number VARCHAR(30) NOT NULL,
+    otp VARCHAR(6) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

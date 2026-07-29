@@ -1,0 +1,184 @@
+<?php
+session_start();
+
+define('SESSION_TIMEOUT_SECONDS', 600);
+
+function enforce_session_timeout() {
+    if (!isset($_SESSION['last_activity'])) {
+        $_SESSION['last_activity'] = time();
+        return;
+    }
+
+    if ((time() - (int)$_SESSION['last_activity']) > SESSION_TIMEOUT_SECONDS) {
+        session_unset();
+        session_destroy();
+        session_start();
+        $_SESSION['error_message'] = 'Your session expired. Please log in again.';
+        return;
+    }
+
+    $_SESSION['last_activity'] = time();
+}
+
+enforce_session_timeout();
+
+// Check if user is logged in
+function is_logged_in() {
+    return isset($_SESSION['user_id']);
+}
+
+// Check user role
+function check_role($required_role) {
+    if (!is_logged_in()) {
+        return false;
+    }
+    return $_SESSION['user_role'] === $required_role;
+}
+
+// Redirect if not logged in
+function require_login() {
+    if (!is_logged_in()) {
+        header("Location: " . BASE_URL . "login.php");
+        exit();
+    }
+}
+
+// Redirect if not specific role
+function require_role($role) {
+    require_login();
+    if ($_SESSION['user_role'] !== $role) {
+        // Log unauthorized access before redirecting
+        global $conn;
+        if (isset($conn)) {
+            log_audit_event($conn, 'unauthorized_access',
+                'Required role: ' . $role . ' | Actual role: ' . ($_SESSION['user_role'] ?? 'none'));
+        }
+        header("Location: " . BASE_URL . "unauthorized.php");
+        exit();
+    }
+    // page_access events are intentionally NOT logged here —
+    // only login, logout and unauthorized events are recorded.
+}
+
+// Get user info
+function get_user_info($user_id, $conn) {
+    $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+function hash_password($password) {
+    return password_hash($password, PASSWORD_DEFAULT);
+}
+
+function verify_password($password, $hash) {
+    if (empty($hash)) {
+        return false;
+    }
+    // Support existing plain-text accounts and new hashed accounts.
+    if (password_get_info($hash)['algo'] !== null) {
+        return password_verify($password, $hash);
+    }
+    return hash_equals((string)$hash, (string)$password);
+}
+
+// Escape input
+function escape_input($data, $conn) {
+    return $conn->real_escape_string(trim($data));
+}
+
+// Success message
+function set_success_message($message) {
+    $_SESSION['success_message'] = $message;
+}
+
+// Error message
+function set_error_message($message) {
+    $_SESSION['error_message'] = $message;
+}
+
+// Display success message
+function display_success_message() {
+    if (isset($_SESSION['success_message'])) {
+        echo '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+        echo $_SESSION['success_message'];
+        echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        echo '</div>';
+        unset($_SESSION['success_message']);
+    }
+}
+
+// Display error message
+function display_error_message() {
+    if (isset($_SESSION['error_message'])) {
+        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+        echo $_SESSION['error_message'];
+        echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        echo '</div>';
+        unset($_SESSION['error_message']);
+    }
+}
+
+// Display all messages (success and error combined)
+function display_messages() {
+    display_success_message();
+    display_error_message();
+}
+
+// ── Audit Logging ──────────────────────────────────────────────────────────
+/**
+ * Write a row to audit_logs_v2.
+ *
+ * @param mysqli $conn
+ * @param string $event_type  One of: login_success | login_failed | logout |
+ *                            unauthorized_access | page_access
+ * @param string|null $details  Extra context string
+ */
+function log_audit_event($conn, string $event_type, ?string $details = null): void {
+    // Snapshot session values (may be null for unauthenticated events)
+    $user_id    = $_SESSION['user_id']   ?? null;
+    $username   = $_SESSION['username']  ?? null;
+    $role       = $_SESSION['user_role'] ?? null;
+
+    // Never log audit events for guest accounts
+    if ($role === 'guest') return;
+
+    // Also skip if the details string indicates a guest role login attempt
+    if ($details !== null && stripos($details, 'Role: guest') !== false) return;
+
+    // Current page (relative to docroot)
+    $page = $_SERVER['REQUEST_URI'] ?? null;
+    if ($page && strlen($page) > 255) {
+        $page = substr($page, 0, 255);
+    }
+
+    // IP — handle proxies
+    $ip = $_SERVER['HTTP_X_FORWARDED_FOR']
+        ?? $_SERVER['HTTP_CLIENT_IP']
+        ?? $_SERVER['REMOTE_ADDR']
+        ?? null;
+    if ($ip && strlen($ip) > 45) {
+        $ip = substr($ip, 0, 45);
+    }
+
+    $ua = isset($_SERVER['HTTP_USER_AGENT'])
+        ? substr($_SERVER['HTTP_USER_AGENT'], 0, 500)
+        : null;
+
+    $stmt = $conn->prepare(
+        "INSERT INTO audit_logs_v2
+         (user_id, username, role, event_type, page, ip_address, user_agent, details)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+    );
+    if (!$stmt) return; // silently skip if table missing
+
+    $stmt->bind_param(
+        'isssssss',
+        $user_id, $username, $role,
+        $event_type, $page, $ip, $ua, $details
+    );
+    $stmt->execute();
+    $stmt->close();
+}
+?>

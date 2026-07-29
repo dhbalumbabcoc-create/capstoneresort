@@ -1,0 +1,834 @@
+
+:root {
+    --primary-color: #1B7D3A;
+    --secondary-color: #27A457;
+    --success-color: #43e97b;
+    --danger-color: #ff6b6b;
+    --warning-color: #ffd89b;
+    --info-color: #4facfe;
+}
+
+/* ===================================
+   Global Styles
+   =================================== */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ===================================
+   Hero Section
+   =================================== */
+
+.hero-section {
+    min-height: 600px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 0;
+}
+
+.hero-section .z-1 {
+    z-index: 1;
+}
+
+.hero-cta .btn {
+    padding: 12px 30px;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.hero-cta .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* ===================================
+   Quick Booking Section
+   =================================== */
+
+.quick-booking {
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.quick-booking form {
+    margin: 0;
+}
+
+.form-control-lg, .form-select-lg {
+    padding: 12px 15px;
+    font-size: 1rem;
+}
+
+/* ===================================
+   Facility Cards
+   =================================== */
+
+.facility-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.facility-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.facility-card-img {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.facility-card:hover .facility-card-img {
+    transform: scale(1.1);
+}
+
+.facility-image {
+    transition: transform 0.3s ease;
+}
+
+.facility-card:hover .facility-image {
+    transform: scale(1.05);
+}
+
+.facility-card .card-title {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.facility-category {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.facility-category:last-child {
+    border-bottom: none;
+}
+
+.facility-details {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.hover-shadow {
+    transition: box-shadow 0.3s ease;
+}
+
+.hover-shadow:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ===================================
+   Amenity Cards
+   =================================== */
+
+.amenity-card {
+    padding: 30px;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.amenity-card:hover {
+    transform: translateY(-5px);
+    background: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* ===================================
+   Testimonial Cards
+   =================================== */
+
+.testimonial-card {
+    border: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+.rating {
+    font-size: 1.2rem;
+}
+
+/* ===================================
+   Package Cards
+   =================================== */
+
+.package-card {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.package-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.package-card .card-header {
+    border-bottom: 4px solid rgba(255, 255, 255, 0.2);
+}
+
+.package-card .btn {
+    border-radius: 50px;
+    padding: 10px 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.package-card .btn:hover {
+    transform: scale(1.05);
+}
+
+/* ===================================
+   Navigation
+   =================================== */
+
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+}
+
+
+/* Remove underline and hover for sidebar nav links */
+.sidebar .nav-link:after,
+.sidebar .nav-link:hover:after {
+    display: none !important;
+}
+
+.sidebar {
+    z-index: 1001;
+    position: relative;
+    overflow: visible !important;
+}
+
+/* Ensure sidebar dropdown/collapse menus are visible and clickable */
+.sidebar .collapse {
+    display: none;
+}
+.sidebar .collapse.show {
+    display: block;
+    position: static;
+    background: none;
+    box-shadow: none;
+    z-index: 1002;
+}
+
+/* ===================================
+   Buttons
+   =================================== */
+
+.btn {
+    border-radius: 50px;
+    padding: 10px 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    color: white;
+}
+
+/* ===================================
+   Forms
+   =================================== */
+
+.form-control, .form-select {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* ===================================
+   Tables
+   =================================== */
+
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table thead {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+}
+
+.table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* ===================================
+   Footer
+   =================================== */
+
+footer {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+footer a {
+    transition: all 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--primary-color) !important;
+}
+
+/* ===================================
+   Badges & Labels
+   =================================== */
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+/* ===================================
+   Cards
+   =================================== */
+
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+    border-bottom: 2px solid var(--primary-color);
+    border-radius: 10px 10px 0 0 !important;
+}
+
+/* ===================================
+   Sections
+   =================================== */
+
+section {
+    padding: 60px 0;
+}
+
+section h2 {
+    color: #333;
+    margin-bottom: 40px;
+}
+
+section h2::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    margin: 20px auto 0;
+    border-radius: 2px;
+}
+
+/* ===================================
+   Utility Classes
+   =================================== */
+
+.transition {
+    transition: all 0.3s ease;
+}
+
+.shadow-lg {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+}
+
+.border-top-gradient {
+    border-top: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(90deg, var(--primary-color), var(--secondary-color)) border-box;
+}
+
+/* ===================================
+   Responsive Design
+   =================================== */
+
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 400px;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .display-4 {
+        font-size: 2rem;
+    }
+
+    section {
+        padding: 40px 0;
+    }
+
+    .quick-booking form .row {
+        flex-direction: column;
+    }
+
+    .quick-booking form .col-md-3,
+    .quick-booking form .col-md-4 {
+        flex: 0 0 100%;
+        margin-bottom: 10px;
+    }
+
+    .facility-card {
+        margin-bottom: 20px;
+    }
+
+    .amenity-card {
+        padding: 20px;
+        text-align: center;
+    }
+
+    .nav-link:after {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .display-3 {
+        font-size: 1.75rem;
+    }
+
+    .hero-section {
+        min-height: 300px;
+        padding: 40px 0 !important;
+    }
+
+    .quick-booking form .col-md-3,
+    .quick-booking form .col-md-4 {
+        flex: 0 0 100%;
+    }
+
+    .btn {
+        width: 100% !important;
+        margin-bottom: 10px;
+    }
+
+    footer {
+        text-align: center;
+    }
+
+    footer .col-md-6.text-md-end {
+        text-align: center !important;
+    }
+}
+
+/* ===================================
+   Animation Classes
+   =================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* ===================================
+   Entrance Cards Enhancement
+   =================================== */
+
+.entrance-card {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.entrance-card.hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.entrance-card .card-header {
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.pricing-table {
+    background: white;
+}
+
+.pricing-row {
+    transition: background-color 0.2s ease;
+}
+
+.pricing-row:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.pricing-row td {
+    vertical-align: middle;
+}
+
+.category-label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.price-value {
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+}
+
+.amenities-list ul li {
+    color: #5a6c7d;
+    line-height: 1.8;
+}
+
+.entrance-card.featured-card {
+    position: relative;
+    box-shadow: 0 10px 30px rgba(255, 193, 7, 0.3) !important;
+}
+
+.entrance-card.featured-card:hover {
+    box-shadow: 0 20px 50px rgba(255, 193, 7, 0.4) !important;
+}
+
+/* ===================================
+   Facility Photo Cards
+   =================================== */
+
+.facility-photo-card {
+    height: 100%;
+    transition: transform 0.3s ease;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.facility-photo-card:hover {
+    transform: translateY(-5px);
+}
+
+.facility-photo-wrapper {
+    position: relative;
+    overflow: hidden;
+    height: 320px;
+    cursor: pointer;
+}
+
+.facility-photo-wrapper.featured-highlight {
+    border: 3px solid #ffc107;
+}
+
+.popular-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ffc107;
+    color: #000;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.facility-photo-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.facility-photo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(27, 125, 58, 0.7), rgba(27, 125, 58, 0.9));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.facility-photo-wrapper:hover img {
+    transform: scale(1.15);
+}
+
+.facility-photo-wrapper:hover .facility-photo-overlay {
+    opacity: 1;
+}
+
+.overlay-content {
+    text-align: center;
+    color: white;
+    transform: translateY(30px);
+    transition: transform 0.4s ease;
+    padding: 20px;
+}
+
+.facility-photo-wrapper:hover .overlay-content {
+    transform: translateY(0);
+}
+
+.facility-features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+}
+
+.facility-features .badge {
+    font-weight: 500;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+}
+
+.entrance-card.featured-card {
+    border: 3px solid #ffc107;
+    position: relative;
+}
+
+.entrance-card.featured-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
+    pointer-events: none;
+}
+
+.ribbon {
+    position: absolute;
+    top: 15px;
+    right: -35px;
+    width: 150px;
+    background: #ffc107;
+    color: #fff;
+    text-align: center;
+    line-height: 30px;
+    transform: rotate(45deg);
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ribbon span {
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* ===================================
+   Print Styles
+   =================================== */
+
+@media print {
+    .navbar, footer, .btn-print-hidden {
+        display: none !important;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    body {
+        background: white;
+    }
+}
+
+/* ===================================
+   Analytics Dashboard Responsive
+   =================================== */
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+/* Supervisor Dashboard Card Styles */
+.dashboard-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #0001;
+    padding: 24px 18px;
+    margin-bottom: 24px;
+    transition: box-shadow 0.2s;
+}
+.dashboard-card:hover {
+    box-shadow: 0 6px 24px #0002;
+}
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    box-shadow: 0 2px 8px #0001;
+    border-radius: 10px;
+    background: #f9f9f9;
+    margin-bottom: 18px;
+}
+.stat-icon {
+    font-size: 2.2em;
+    margin-bottom: 8px;
+}
+.stat-number {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.stat-label {
+    font-size: 1em;
+    color: #666;
+}
+
+/* Status and Priority Badges */
+.status-available {
+    color: #28a745;
+    font-weight: 600;
+}
+.status-maintenance {
+    color: #ffc107;
+    font-weight: 600;
+}
+.status-unavailable {
+    color: #dc3545;
+    font-weight: 600;
+}
+.priority-high {
+    color: #dc3545;
+    font-weight: 600;
+}
+.priority-medium {
+    color: #ffc107;
+    font-weight: 600;
+}
+.priority-low {
+    color: #28a745;
+    font-weight: 600;
+}
+.kpi-row, .charts-row, .bottom-row {
+    display: flex;
+    gap: 24px;
+}
+.kpi-row { margin-bottom: 32px; }
+.charts-row { margin-bottom: 32px; }
+.kpi-tile, .chart-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #0001;
+    padding: 32px 24px;
+    text-align: center;
+    flex: 1;
+}
+.kpi-title { font-size: 1.1em; color: #888; margin-bottom: 8px; }
+.kpi-value { font-size: 2.2em; font-weight: bold; color: #222; }
+.chart-title { font-size: 1em; color: #444; margin-bottom: 12px; }
+.filter-bar {
+    margin-bottom: 24px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.filter-bar label { font-size: 0.95em; color: #555; }
+.filter-bar select, .filter-bar input { padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; }
+
+@media (max-width: 1024px) {
+    .dashboard-container { padding: 16px; }
+    .kpi-row, .charts-row, .bottom-row { gap: 12px; }
+    .kpi-tile, .chart-card { padding: 20px 10px; }
+}
+
+@media (max-width: 900px) {
+    .kpi-row, .charts-row, .bottom-row { flex-direction: column; gap: 18px; }
+    .kpi-tile, .chart-card { min-width: 0; }
+}
+
+@media (max-width: 600px) {
+    .dashboard-container { padding: 6px; }
+    .kpi-tile, .chart-card { padding: 12px 4px; font-size: 0.95em; }
+    .kpi-value { font-size: 1.3em; }
+    .kpi-title, .chart-title { font-size: 0.95em; }
+    .filter-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+

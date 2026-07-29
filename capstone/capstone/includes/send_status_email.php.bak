@@ -1,0 +1,246 @@
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+function sendBookingStatusEmail($booking_data, $status) {
+    $mail = new PHPMailer(true);
+    
+    try {
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'bucod.lyngemae123@gmail.com';
+        $mail->Password   = 'oqjt slmc lmsv kmis';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+
+        // Recipients
+        $mail->setFrom('bucod.lyngemae123@gmail.com', 'Sinulom Falls and Bolao Cold Spring');
+        $mail->addAddress($booking_data['guest_email'], $booking_data['guest_name']);
+        $mail->addReplyTo('bucod.lyngemae123@gmail.com', 'Sinulom Falls and Bolao Cold Spring');
+
+        // Content
+        $mail->isHTML(true);
+        
+        if ($status === 'confirmed') {
+            $booking_id_padded = str_pad($booking_data['id'], 6, '0', STR_PAD_LEFT);
+            $mail->Subject = 'Booking Confirmed - Sinulom & Bolao Cold Spring Resort #' . $booking_id_padded;
+            $emailBody = generateApprovedEmailBody($booking_data);
+        } else {
+            $mail->Subject = 'Booking Update - Sinulom Falls and Bolao Cold Spring';
+            $emailBody = generateDeclinedEmailBody($booking_data);
+        }
+        
+        $mail->Body = $emailBody;
+        $mail->AltBody = strip_tags($emailBody);
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
+        return false;
+    }
+}
+
+function generateApprovedEmailBody($data) {
+    $booking_id  = str_pad($data['id'], 6, '0', STR_PAD_LEFT);
+    $check_in    = date('F d, Y', strtotime($data['check_in_date']));
+    $check_out   = ($data['mode'] === 'daytour') ? 'Same Day (Day Tour)' : date('F d, Y', strtotime($data['check_out_date'] ?? $data['check_in_date']));
+    $total       = number_format($data['total_price'], 2);
+    $mode_label  = ucfirst($data['mode'] ?? 'N/A');
+    $adults      = intval($data['num_adults'] ?? 0);
+    $children    = intval($data['num_children'] ?? 0);
+    $phone       = htmlspecialchars($data['guest_phone'] ?? '');
+    $name        = htmlspecialchars($data['guest_name'] ?? '');
+    $email_addr  = htmlspecialchars($data['guest_email'] ?? '');
+    $facility    = htmlspecialchars($data['facility_name'] ?? 'N/A');
+    $area        = htmlspecialchars($data['area_name'] ?? 'N/A');
+    $now         = date('F d, Y h:i A');
+
+    // Extract time slot from notes if available
+    $ts_label = 'N/A';
+    if (!empty($data['notes']) && preg_match('/Time Slot:\s*([a-z0-9_\-]+)/i', $data['notes'], $m)) {
+        $ts_map   = ['8am-5pm' => '8:00 AM - 5:00 PM', '5pm-10pm' => '5:00 PM - 10:00 PM', 'full_night' => 'Full Night (Overnight)'];
+        $ts_label = $ts_map[strtolower($m[1])] ?? $m[1];
+    }
+
+    $html  = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>';
+    $html .= 'body{font-family:Arial,sans-serif;background:#f5f0e8;margin:0;padding:20px;}';
+    $html .= '.wrap{max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);}';
+    $html .= '.hdr{background:#1a3d2b;padding:32px 36px;text-align:center;color:#fff;}';
+    $html .= '.hdr-icon{font-size:48px;margin-bottom:12px;}';
+    $html .= '.hdr h1{font-size:22px;margin:0 0 4px;font-weight:700;}';
+    $html .= '.hdr p{font-size:13px;color:rgba(255,255,255,.75);margin:4px 0 0;}';
+    $html .= '.body{padding:32px 36px;}';
+    $html .= '.greeting{font-size:16px;color:#1a1a1a;margin-bottom:8px;}';
+    $html .= '.sub{font-size:14px;color:#6b7280;margin-bottom:24px;line-height:1.6;}';
+    $html .= '.ref-box{background:#f0faf4;border:1px solid #c8e6c9;border-radius:10px;padding:14px 20px;margin-bottom:24px;}';
+    $html .= '.ref-id{font-size:20px;font-weight:800;color:#1a3d2b;}';
+    $html .= '.ref-status{display:inline-block;background:#d4edda;color:#155724;border:1px solid #c3e6cb;border-radius:50px;padding:3px 12px;font-size:12px;font-weight:700;margin-top:6px;}';
+    $html .= '.sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;margin:20px 0 10px;border-bottom:1px solid #f0f0f0;padding-bottom:6px;}';
+    $html .= 'table.dt{width:100%;border-collapse:collapse;}';
+    $html .= 'table.dt td{padding:9px 0;border-bottom:1px solid #f5f0e8;font-size:14px;}';
+    $html .= 'table.dt .lbl{color:#6b7280;width:45%;}';
+    $html .= 'table.dt .val{color:#1a1a1a;font-weight:600;text-align:right;}';
+    $html .= '.total-box{background:#1a3d2b;border-radius:10px;padding:18px 20px;margin:24px 0;overflow:hidden;}';
+    $html .= '.total-box .tl{color:rgba(255,255,255,.75);font-size:13px;display:block;}';
+    $html .= '.total-box .tv{color:#fff;font-size:24px;font-weight:800;display:block;margin-top:4px;}';
+    $html .= '.total-box .tn{color:rgba(255,255,255,.6);font-size:12px;display:block;margin-top:4px;}';
+    $html .= '.remind{background:#fff8e1;border-left:4px solid #ffc107;border-radius:6px;padding:16px 20px;margin-bottom:24px;}';
+    $html .= '.remind h4{font-size:13px;font-weight:700;color:#856404;margin:0 0 8px;}';
+    $html .= '.remind li{font-size:13px;color:#856404;margin-bottom:5px;line-height:1.5;}';
+    $html .= '.ftr{background:#1a3d2b;padding:24px 36px;text-align:center;}';
+    $html .= '.ftr p{color:rgba(255,255,255,.65);font-size:12px;margin:4px 0;}';
+    $html .= '</style></head><body>';
+    $html .= '<div class="wrap">';
+    $html .= '<div class="hdr"><div class="hdr-icon">✅</div><h1>Booking Confirmed!</h1>';
+    $html .= '<p>Your reservation has been approved &amp; confirmed</p>';
+    $html .= '<p style="font-size:11px;color:rgba(255,255,255,.5);">Issued: ' . $now . '</p></div>';
+    $html .= '<div class="body">';
+    $html .= '<p class="greeting">Dear <strong>' . $name . '</strong>,</p>';
+    $html .= '<p class="sub">Great news! Your booking at <strong>Sinulom Falls &amp; Bolao Cold Spring Resort</strong> has been <strong style="color:#1a3d2b;">approved and confirmed</strong>. We look forward to welcoming you!</p>';
+    $html .= '<div class="ref-box"><div class="ref-id">Booking #' . $booking_id . '</div><div class="ref-status">✓ CONFIRMED</div></div>';
+
+    // Guest info
+    $html .= '<div class="sec">Guest Information</div>';
+    $html .= '<table class="dt">';
+    $html .= '<tr><td class="lbl">Full Name</td><td class="val">' . $name . '</td></tr>';
+    $html .= '<tr><td class="lbl">Email</td><td class="val">' . $email_addr . '</td></tr>';
+    $html .= '<tr><td class="lbl">Contact</td><td class="val">' . $phone . '</td></tr>';
+    $html .= '</table>';
+
+    // Booking details
+    $html .= '<div class="sec">Booking Details</div>';
+    $html .= '<table class="dt">';
+    $html .= '<tr><td class="lbl">Booking Mode</td><td class="val">' . $mode_label . '</td></tr>';
+    if ($ts_label !== 'N/A') {
+        $html .= '<tr><td class="lbl">Time Slot</td><td class="val">' . htmlspecialchars($ts_label) . '</td></tr>';
+    }
+    $html .= '<tr><td class="lbl">Location</td><td class="val">' . $area . '</td></tr>';
+    $html .= '<tr><td class="lbl">Facility</td><td class="val">' . $facility . '</td></tr>';
+    $html .= '<tr><td class="lbl">Check-in</td><td class="val">' . $check_in . '</td></tr>';
+    if ($data['mode'] !== 'daytour') {
+        $html .= '<tr><td class="lbl">Check-out</td><td class="val">' . $check_out . '</td></tr>';
+    }
+    $html .= '<tr><td class="lbl">Adults</td><td class="val">' . $adults . '</td></tr>';
+    $html .= '<tr><td class="lbl">Children</td><td class="val">' . $children . '</td></tr>';
+    $html .= '</table>';
+
+    // Total
+    $html .= '<div class="total-box"><span class="tl">Total Amount</span><span class="tv">&#8369;' . $total . '</span><span class="tn">Payment due upon arrival</span></div>';
+
+    // Reminders
+    $html .= '<div class="remind"><h4>📋 Important Reminders</h4><ul>';
+    $html .= '<li>Proceed to the <strong>ticketing office</strong> upon arrival to complete payment and claim your wristband.</li>';
+    $html .= '<li>If paying via <strong>GCash</strong>, please contact us or message our Facebook page during office hours.</li>';
+    $html .= '<li>Please bring a <strong>valid ID</strong> on the day of your visit.</li>';
+    $html .= '<li><strong>Cancellation Policy:</strong> NO refunds upon cancellation.</li>';
+    $html .= '<li>If you need to modify or cancel, please contact us at least <strong>24 hours in advance</strong>.</li>';
+    $html .= '</ul></div>';
+
+    $html .= '<p style="font-size:13px;color:#6b7280;">Questions? Contact us at <a href="mailto:bucod.lyngemae123@gmail.com" style="color:#1a3d2b;">bucod.lyngemae123@gmail.com</a>.</p>';
+    $html .= '</div>';
+    $html .= '<div class="ftr"><p><strong style="color:#fff;">Sinulom Falls &amp; Bolao Cold Spring Resort</strong></p>';
+    $html .= '<p>Tignapoloan, Cagayan de Oro City, Philippines</p>';
+    $html .= '<p style="margin-top:10px;font-size:11px;">This is an automated confirmation. Please do not reply directly.</p></div>';
+    $html .= '</div></body></html>';
+
+    return $html;
+}
+
+function generateDeclinedEmailBody($data) {
+    $booking_id = str_pad($data['id'], 6, '0', STR_PAD_LEFT);
+    $check_in = date('F d, Y', strtotime($data['check_in_date']));
+    
+    $html = '
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+            .container { max-width: 600px; margin: 20px auto; background: white; }
+            .header { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 40px 30px; text-align: center; }
+            .header h1 { margin: 0; font-size: 28px; }
+            .header .icon { font-size: 60px; margin-bottom: 15px; }
+            .content { padding: 40px 30px; }
+            .booking-info { background: #f9f9f9; padding: 25px; margin: 25px 0; border-radius: 8px; border-left: 5px solid #dc3545; }
+            .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e0e0e0; }
+            .info-row:last-child { border-bottom: none; }
+            .label { color: #666; font-weight: 600; }
+            .value { color: #333; font-weight: 500; }
+            .alert-danger { background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 4px; color: #721c24; }
+            .alert-info { background: #d1ecf1; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 4px; color: #0c5460; }
+            .footer { background: #333; color: #999; padding: 30px; text-align: center; font-size: 14px; }
+            .footer strong { color: white; }
+            .button { display: inline-block; background: #17a2b8; color: white; padding: 15px 35px; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="icon">ℹ️</div>
+                <h1>Booking Update</h1>
+                <p style="margin: 10px 0 0 0; font-size: 16px;">Regarding your reservation</p>
+            </div>
+            
+            <div class="content">
+                <div class="alert-danger">
+                    <strong>We apologize!</strong> Unfortunately, we are unable to confirm your booking at this time. This may be due to facility unavailability or other scheduling conflicts.
+                </div>
+                
+                <h2 style="color: #721c24; margin-top: 30px;">Booking Details</h2>
+                <p>Dear <strong>' . htmlspecialchars($data['guest_name']) . '</strong>,</p>
+                
+                <div class="booking-info">
+                    <div class="info-row">
+                        <span class="label">Booking ID:</span>
+                        <span class="value">#' . $booking_id . '</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Status:</span>
+                        <span class="value" style="color: #dc3545; font-weight: bold;">✗ DECLINED</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Booking Mode:</span>
+                        <span class="value">' . ucfirst($data['mode']) . '</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Facility:</span>
+                        <span class="value">' . htmlspecialchars($data['facility_name']) . '</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Requested Date:</span>
+                        <span class="value">' . $check_in . '</span>
+                    </div>
+                </div>
+                
+                <div class="alert-info">
+                    <h3 style="margin-top: 0;">💡 What You Can Do</h3>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Try booking for different dates</li>
+                        <li>Choose an alternative facility</li>
+                        <li>Contact us directly for assistance: <strong>+63 123 456 7890</strong></li>
+                        <li>Visit our website to check availability</li>
+                    </ul>
+                </div>
+                
+                <p style="text-align: center; margin: 30px 0;">
+                    <a href="http://localhost/capstone/public_booking.php" class="button">Make Another Booking</a>
+                </p>
+                
+                <p style="margin-top: 30px;">We sincerely apologize for any inconvenience. We value your interest in Sinulom Falls and Bolao Cold Spring and hope to serve you in the future.</p>
+                
+                <p style="margin-top: 20px;"><strong>Questions?</strong> Feel free to contact us at bucod.lyngemae123@gmail.com or call +63 123 456 7890.</p>
+            </div>
+            
+            
+        </div>
+    </body>
+    </html>';
+    
+    return $html;
+}
+?>
